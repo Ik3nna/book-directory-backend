@@ -12,7 +12,8 @@ const express = require('express');
 const app = express();
 const connectDB = require('./db/connect');
 const booksRouter = require('./routes/book');
-
+const notFoundMiddleware = require('./middleware/not-found')
+const errorHandlerMiddleware = require("./middleware/error-handler")
 
 app.set('truxt proxy', 1);
 app.use(rateLimiter({
@@ -27,7 +28,8 @@ app.use(xss());
 
 // routes
 app.use('/api/v1/books', booksRouter);
-
+app.use(notFoundMiddleware)
+app.use(errorHandlerMiddleware)
 
 const port = process.env.PORT || 5000;
 

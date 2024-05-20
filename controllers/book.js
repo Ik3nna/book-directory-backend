@@ -1,5 +1,6 @@
 const Book = require('../models/book');
-const { StatusCodes } = require('http-status-codes')
+const { StatusCodes } = require('http-status-codes');
+const { NotFoundError, BadRequestError } = require("../errors")
 
 const getAllBooks = async (req, res) => {
     const books = await Book.find({});
@@ -11,7 +12,7 @@ const getSingleBook = async (req, res) => {
     const book = await Book.findOne({_id: id});
 
     if (!book) {
-
+        throw new NotFoundError(`No book with id ${id}`)
     }
 
     res.status(StatusCodes.OK).json({ book })
@@ -24,14 +25,19 @@ const addBook = async (req, res) => {
 
 const updateBook = async (req, res) => {
     const { id } = req.params;
+    const { body: { title, author, pages, link } } = req;
     const book = await Book.findByIdAndUpdate(
         {_id: id},
         req.body,
         { new: true, runValidators: true }
     )
 
-    if (!book) {
+    if (title === "" || author === "" || pages === "" || link === "") {
+        throw new BadRequestError("Please ensure you fill in the right details")
+    }
 
+    if (!book) {
+        throw new NotFoundError(`No book with id ${id}`)
     }
 
     res.status(StatusCodes.OK).json({book})
@@ -42,7 +48,7 @@ const deleteBook = async (req, res) => {
     const book = await Book.findOneAndDelete({_id:id});
 
     if (!book) {
-
+        throw new NotFoundError(`No book with id ${id}`)
     }
     
     res.status(StatusCodes.OK).json({ book })
