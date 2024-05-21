@@ -44,7 +44,7 @@ const updateBook = async (req, res) => {
 }
 
 const deleteBook = async (req, res) => {
-    const { id } = req.body;
+    const { id } = req.params;
     const book = await Book.findOneAndDelete({_id:id});
 
     if (!book) {
